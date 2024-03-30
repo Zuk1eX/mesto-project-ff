@@ -13,11 +13,6 @@ module.exports = {
     publicPath: "",
   },
   mode: "development",
-  devServer: {
-    static: path.resolve(__dirname, "./dist"),
-    compress: true,
-    port: 8080,
-  },
   module: {
     rules: [
       {
@@ -46,4 +41,12 @@ module.exports = {
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin(),
   ],
+  devServer: {
+    static: path.resolve(__dirname, "./dist"),
+    compress: true,
+    watchFiles: {
+      paths: ['src/*']
+    },
+    port: 8080,
+  },
 };
