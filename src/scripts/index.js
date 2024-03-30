@@ -1,12 +1,7 @@
 // Импорты
 import { initialCards } from "./cards.js";
 import { createCard, removeCard, likeCard } from "./card.js";
-import {
-  openModal,
-  closeModal,
-  closeModalHandler,
-  closeModalEscHandler,
-} from "./modal.js";
+import { openModal, closeModal, closeModalHandler } from "./modal.js";
 
 // DOM узлы
 const profileInfo = document.querySelector(".profile__info");
@@ -26,13 +21,21 @@ editProfileButton.addEventListener("click", editProfileHandler);
 addCardButton.addEventListener("click", addCardHandler);
 editProfileForm.addEventListener("submit", editProfileFormSubmitHandler);
 addCardForm.addEventListener("submit", addCardFormSubmitHandler);
+editProfilePopup.addEventListener("click", closeModalHandler);
+addCardPopup.addEventListener("click", closeModalHandler);
+openCardPopup.addEventListener("click", closeModalHandler);
 
 // Рендеринг карточек на страницу
 renderCards(initialCards, cardsList);
 
 // Функция рендеринга 1 карточки на страницу
 function renderCard(cardInfo, cardsContainerElement, to = "append") {
-  const cardElement = createCard(cardInfo, removeCard, likeCard, openCard);
+  const cardElement = createCard(
+    cardInfo,
+    () => removeCard(cardElement),
+    likeCard,
+    () => openCard(cardInfo)
+  );
   cardsContainerElement[to](cardElement);
 }
 
@@ -50,6 +53,7 @@ function addCardFormSubmitHandler(event) {
 
   renderCard({ name: name.value, link: link.value }, cardsList, "prepend");
   closeModal(addCardPopup);
+  addCardForm.reset();
 }
 
 // Функция-обработчик сабмита формы редактирования профиля
@@ -63,6 +67,7 @@ function editProfileFormSubmitHandler(event) {
     description.value,
   ];
   closeModal(editProfilePopup);
+  editProfileForm.reset();
 }
 
 // Функция получения текстовых элементов профиля
@@ -84,30 +89,21 @@ function editProfileHandler() {
   ];
 
   openModal(editProfilePopup);
-  editProfilePopup.addEventListener("click", closeModalHandler);
-  document.addEventListener("keydown", closeModalEscHandler);
 }
 
 // Функция-обработчик кнопки добавления карточки
 function addCardHandler() {
   openModal(addCardPopup);
-  addCardPopup.addEventListener("click", closeModalHandler);
-  document.addEventListener("keydown", closeModalEscHandler);
 }
 
 // Функция открытия модального окна изображения карточки
-function openCard(event) {
-  const target = event.target;
-  const card = target.closest(".card");
-  const cardTitle = card.querySelector(".card__title");
+function openCard({ name, link }) {
   const popupImage = openCardPopup.querySelector(".popup__image");
   const popupCaption = openCardPopup.querySelector(".popup__caption");
 
-  popupImage.src = target.src;
-  popupImage.alt = target.alt;
-  popupCaption.textContent = cardTitle.textContent;
+  popupImage.src = link;
+  popupImage.alt = name;
+  popupCaption.textContent = name;
 
   openModal(openCardPopup);
-  openCardPopup.addEventListener("click", closeModalHandler);
-  document.addEventListener("keydown", closeModalEscHandler);
 }

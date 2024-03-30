@@ -31,8 +31,8 @@ function likeCard(event) {
 }
 
 // Функция удаления карточки
-function removeCard(event) {
-  event.target.closest(".card").remove();
+function removeCard(cardElement) {
+  cardElement.remove();
 }
 
 export { createCard, removeCard, likeCard };
