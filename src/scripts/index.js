@@ -2,7 +2,8 @@
 import { initialCards } from "./cards.js";
 import { createCard, removeCard, likeCard } from "./card.js";
 import { openModal, closeModal, closeModalHandler } from "./modal.js";
-import { enableValidation, clearValidation } from "./validation.js";
+// import { enableValidation, clearValidation } from "./validation.js";
+import { Validation } from "./validation.js";
 
 // DOM узлы
 const profileInfo = document.querySelector(".profile__info");
@@ -17,6 +18,7 @@ const openCardPopup = document.querySelector(".popup_type_image");
 const editProfileForm = document.forms["edit-profile"];
 const addCardForm = document.forms["new-place"];
 
+// Настройка валидации форм
 const validationConfig = {
 	formSelector: ".form",
 	inputSelector: ".form__input",
@@ -25,6 +27,8 @@ const validationConfig = {
 	inputErrorClass: "form__input_type_error",
 	errorClass: "form__input-error_active",
 };
+const validation = new Validation(validationConfig);
+validation.enableValidation();
 
 // Назначение обработчиков
 editProfileButton.addEventListener("click", editProfileHandler);
@@ -95,14 +99,14 @@ function editProfileHandler() {
 		profileName.textContent,
 		profileDesc.textContent,
 	];
-	clearValidation(editProfileForm, validationConfig);
+	validation.clearValidation(editProfileForm);
 	openModal(editProfilePopup);
 }
 
 // Функция-обработчик кнопки добавления карточки
 function addCardHandler() {
 	addCardForm.reset();
-	clearValidation(addCardForm, validationConfig);
+	validation.clearValidation(addCardForm);
 	openModal(addCardPopup);
 }
 
@@ -117,5 +121,3 @@ function openCard({ name, link }) {
 
 	openModal(openCardPopup);
 }
-
-enableValidation(validationConfig);
