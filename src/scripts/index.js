@@ -4,6 +4,13 @@ import { createCard, removeCard, likeCard } from "./card.js";
 import { openModal, closeModal, closeModalHandler } from "./modal.js";
 // import { enableValidation, clearValidation } from "./validation.js";
 import { Validation } from "./validation.js";
+import {
+	addCard,
+	deleteCard,
+	getInitialCards,
+	getUserInfo,
+	updateUserInfo,
+} from "./api.js";
 
 // DOM узлы
 const profileInfo = document.querySelector(".profile__info");
@@ -39,14 +46,30 @@ editProfilePopup.addEventListener("click", closeModalHandler);
 addCardPopup.addEventListener("click", closeModalHandler);
 openCardPopup.addEventListener("click", closeModalHandler);
 
-// Рендеринг карточек на страницу
-renderCards(initialCards, cardsList);
+// Запрос и рендеринг информации о пользователе и карточек на страницу
+Promise.all([getUserInfo(), getInitialCards()])
+	.then(([user, cards]) => {
+		renderUserInfo(user);
+		renderCards(user._id, cards, cardsList);
+	})
+	.catch((error) => {
+		console.log(error);
+	});
 
 // Функция рендеринга 1 карточки на страницу
-function renderCard(cardInfo, cardsContainerElement, to = "append") {
+function renderCard(userId, cardInfo, cardsContainerElement, to = "append") {
 	const cardElement = createCard(
+		userId,
 		cardInfo,
-		() => removeCard(cardElement),
+		() => {
+			deleteCard(cardInfo._id)
+				.then(() => {
+					removeCard(cardElement);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		},
 		likeCard,
 		() => openCard(cardInfo)
 	);
@@ -54,9 +77,9 @@ function renderCard(cardInfo, cardsContainerElement, to = "append") {
 }
 
 // Функция рендеринга карточек на страницу
-function renderCards(cardsData, cardsContainerElement) {
+function renderCards(userId, cardsData, cardsContainerElement) {
 	cardsData.forEach((card) => {
-		renderCard(card, cardsContainerElement);
+		renderCard(userId, card, cardsContainerElement);
 	});
 }
 
@@ -65,21 +88,29 @@ function addCardFormSubmitHandler(event) {
 	event.preventDefault();
 	const { "place-name": name, link } = addCardForm.elements;
 
-	renderCard({ name: name.value, link: link.value }, cardsList, "prepend");
-	closeModal(addCardPopup);
+	addCard({ name: name.value, link: link.value })
+		.then((card) => {
+			renderCard(card, cardsList, "prepend");
+			closeModal(addCardPopup);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
 }
 
 // Функция-обработчик сабмита формы редактирования профиля
 function editProfileFormSubmitHandler(event) {
 	event.preventDefault();
-	const { profileName, profileDesc } = getProfileInfo(profileInfo);
 	const { name, description } = editProfileForm.elements;
 
-	[profileName.textContent, profileDesc.textContent] = [
-		name.value,
-		description.value,
-	];
-	closeModal(editProfilePopup);
+	updateUserInfo({ name: name.value, about: description.value })
+		.then((user) => {
+			closeModal(editProfilePopup);
+			renderUserInfo(user);
+		})
+		.catch((error) => {
+			console.log(error);
+		});
 }
 
 // Функция получения текстовых элементов профиля
@@ -88,6 +119,11 @@ function getProfileInfo(profileInfoElement) {
 	const profileDesc = profileInfoElement.querySelector(".profile__description");
 
 	return { profileName, profileDesc };
+}
+
+async function renderUserInfo({ name, about }) {
+	profileInfo.querySelector(".profile__title").textContent = name;
+	profileInfo.querySelector(".profile__description").textContent = about;
 }
 
 // Функция-обработчик кнопки редактирования профиля
