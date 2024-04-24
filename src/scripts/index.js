@@ -18,6 +18,7 @@ import { checkImageUrl } from "./utils.js";
 // DOM узлы
 const profileImage = document.querySelector(".profile__image");
 const profileInfo = document.querySelector(".profile__info");
+const placesSection = document.querySelector(".places");
 const cardsList = document.querySelector(".places__list");
 
 const editProfileButton = document.querySelector(".profile__edit-button");
@@ -71,6 +72,8 @@ Promise.all([getUserInfo(), getInitialCards()])
 		editProfileButton.disabled = false;
 		editAvatarButton.disabled = false;
 		addCardButton.disabled = false;
+
+		placesSection.classList.remove("places_loading");
 
 		const sortedCards = sortCards(cards);
 		renderCards(user._id, sortedCards, cardsList);
