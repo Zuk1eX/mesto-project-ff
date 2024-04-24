@@ -1,0 +1,7 @@
+.form__button_failed {
+	border: 1px solid #be0000;
+	/* opacity: 0.2; */
+	color: #be0000;
+	background: none;
+	pointer-events: none;
+}

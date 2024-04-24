@@ -20,16 +20,29 @@
 			</header>
 			<main class="content">
 				<section class="profile page__section">
-					<div
-						class="profile__image"
-						style="background-image: url('<%=require('./images/avatar.jpg')%>')"
-					></div>
-					<div class="profile__info">
-						<h1 class="profile__title">Жак-Ив Кусто</h1>
-						<button class="profile__edit-button" type="button"></button>
-						<p class="profile__description">Исследователь океана</p>
+					<div class="profile__image-container">
+						<img
+							src="<%=require('./images/avatar.jpg')%>"
+							alt="Аватар пользователя"
+							class="profile__image"
+						/>
+						<button
+							class="profile__edit-avatar-button"
+							type="button"
+							aria-label="Обновить аватар"
+							disabled
+						></button>
 					</div>
-					<button class="profile__add-button" type="button"></button>
+					<div class="profile__info">
+						<h1 class="profile__title">...</h1>
+						<button
+							class="profile__edit-button"
+							type="button"
+							disabled
+						></button>
+						<p class="profile__description">...</p>
+					</div>
+					<button class="profile__add-button" type="button" disabled></button>
 				</section>
 				<section class="places page__section">
 					<ul class="places__list"></ul>
@@ -38,6 +51,30 @@
 			<footer class="footer page__section">
 				<p class="footer__copyright">© 2024 Mesto Russia</p>
 			</footer>
+			<div class="popup popup_type_edit-avatar popup_is-animated">
+				<div class="popup__content">
+					<button type="button" class="popup__close"></button>
+					<h3 class="popup__title">Обновить аватар</h3>
+					<form class="form popup__form" name="edit-avatar" novalidate>
+						<label class="form__field">
+							<input
+								type="url"
+								name="link"
+								id="avatar-link-input"
+								class="form__input form__input_type_error"
+								placeholder="Ссылка на картинку"
+								required
+								pattern="^https?:\/\/.*"
+								data-error-message="Ссылка должна быть в формате URL (https://...)"
+							/>
+							<span class="form__input-error avatar-link-input-error"></span>
+						</label>
+						<button type="submit" class="button form__button popup__button">
+							Сохранить
+						</button>
+					</form>
+				</div>
+			</div>
 			<div class="popup popup_type_edit popup_is-animated">
 				<div class="popup__content">
 					<button type="button" class="popup__close"></button>
@@ -89,7 +126,7 @@
 								type="text"
 								name="place-name"
 								id="place-name-input"
-								class="form__input form__input_type_error"
+								class="form__input"
 								placeholder="Название"
 								required
 								minlength="2"
@@ -105,16 +142,14 @@
 							<input
 								type="url"
 								name="link"
-								id="link-input"
-								class="form__input form__input_type_error"
+								id="place-link-input"
+								class="form__input"
 								placeholder="Ссылка на картинку"
 								required
 								pattern="^https?:\/\/.*"
 								data-error-message="Ссылка должна быть в формате URL (https://...)"
 							/>
-							<span
-								class="form__input-error link-input-error form__input-error_active"
-							></span>
+							<span class="form__input-error place-link-input-error"></span>
 						</label>
 						<button type="submit" class="button form__button popup__button">
 							Сохранить
@@ -133,7 +168,7 @@
 
 		<template id="card-template">
 			<li class="places__item card" data-id="">
-				<img class="card__image" src="" alt="" />
+				<img class="card__image" src="" alt="" loading="lazy" />
 				<button type="button" class="card__delete-button"></button>
 				<div class="card__description">
 					<h2 class="card__title"></h2>

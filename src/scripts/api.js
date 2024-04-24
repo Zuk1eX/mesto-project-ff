@@ -6,11 +6,27 @@ const config = {
 	},
 };
 
+class APIError extends Error {
+	constructor(message, status) {
+		super(message);
+		this.name = "APIError";
+		this.status = status;
+	}
+}
+
 async function getUserInfo() {
 	try {
 		const response = await fetch(`${config.baseUrl}/users/me`, {
 			headers: config.headers,
 		});
+
+		if (!response.ok) {
+			throw new APIError(
+				"Не удалось получить информацию о пользователе",
+				response.status
+			);
+		}
+
 		const data = await response.json();
 		return data;
 	} catch (e) {
@@ -25,6 +41,14 @@ async function updateUserInfo({ name, about }) {
 			headers: config.headers,
 			body: JSON.stringify({ name, about }),
 		});
+
+		if (!response.ok) {
+			throw new APIError(
+				"Не удалось обновить информацию о пользователе",
+				response.status
+			);
+		}
+
 		const result = await response.json();
 		return result;
 	} catch (e) {
@@ -32,13 +56,18 @@ async function updateUserInfo({ name, about }) {
 	}
 }
 
-async function updateUserAvatar({ avatar }) {
+async function updateUserAvatar(link) {
 	try {
 		const response = await fetch(`${config.baseUrl}/users/me/avatar`, {
 			method: "PATCH",
 			headers: config.headers,
-			body: JSON.stringify({ avatar }),
+			body: JSON.stringify({ avatar: link }),
 		});
+
+		if (!response.ok) {
+			throw new APIError("Не удалось обновить аватар", response.status);
+		}
+
 		const result = await response.json();
 		return result;
 	} catch (e) {
@@ -51,6 +80,11 @@ async function getInitialCards() {
 		const response = await fetch(`${config.baseUrl}/cards`, {
 			headers: config.headers,
 		});
+
+		if (!response.ok) {
+			throw new APIError("Не удалось получить карточки", response.status);
+		}
+
 		const data = await response.json();
 		return data;
 	} catch (e) {
@@ -65,6 +99,11 @@ async function addCard({ name, link }) {
 			headers: config.headers,
 			body: JSON.stringify({ name, link }),
 		});
+
+		if (!response.ok) {
+			throw new APIError("Не удалось добавить карточку", response.status);
+		}
+
 		const result = await response.json();
 		return result;
 	} catch (e) {
@@ -80,7 +119,7 @@ async function deleteCard(cardId) {
 		});
 
 		if (!response.ok) {
-			throw new Error("Не удалось удалить карточку");
+			throw new APIError("Не удалось удалить карточку", response.status);
 		}
 
 		const result = await response.json();
@@ -96,6 +135,11 @@ async function addLike(cardId) {
 			method: "PUT",
 			headers: config.headers,
 		});
+
+		if (!response.ok) {
+			throw new APIError("Не удалось поставить лайк", response.status);
+		}
+
 		const result = await response.json();
 		return result;
 	} catch (e) {
@@ -109,6 +153,11 @@ async function deleteLike(cardId) {
 			method: "DELETE",
 			headers: config.headers,
 		});
+
+		if (!response.ok) {
+			throw new APIError("Не удалось удалить лайк", response.status);
+		}
+
 		const result = await response.json();
 		return result;
 	} catch (e) {
@@ -117,6 +166,7 @@ async function deleteLike(cardId) {
 }
 
 export {
+	APIError,
 	getUserInfo,
 	updateUserInfo,
 	updateUserAvatar,
