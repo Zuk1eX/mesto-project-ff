@@ -90,7 +90,9 @@ class Validation {
 		);
 		const buttonElement = formElement.querySelector(this._submitButtonSelector);
 
+		formElement.reset();
 		this.toggleButtonState(inputList, buttonElement);
+
 		inputList.forEach((inputElement) => {
 			this.hideInputError(formElement, inputElement);
 		});

@@ -12,15 +12,9 @@ function closeModal(popupElement) {
 
 // Функция-обработчик закрытия модального окна
 function closeModalHandler(event) {
-	const openedPopup = document.querySelector(".popup_is-opened");
-
-	if (
-		["popup", "popup__close"].some((className) =>
-			event.target.classList.contains(className)
-		)
-	) {
-		closeModal(openedPopup);
-	}
+	["popup", "popup__close"].some((className) =>
+		event.target.classList.contains(className)
+	) && closeModal(event.currentTarget);
 }
 
 // Функция-обработчик закрытия модального окна по нажатию Escape

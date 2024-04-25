@@ -31,10 +31,6 @@ const editProfileForm = document.forms["edit-profile"];
 const editAvatarForm = document.forms["edit-avatar"];
 const addCardForm = document.forms["new-place"];
 
-let editProfileButtonTimer = null;
-let editAvatarButtonTimer;
-let addCardButtonTimer;
-
 // Настройка валидации форм
 const validationConfig = {
 	formSelector: ".form",
@@ -151,10 +147,7 @@ function addCardFormSubmitHandler(event) {
 		})
 		.catch((e) => apiErrorFormHandler(e, addCardForm))
 		.finally(() => {
-			addCardButtonTimer = setTimeout(
-				() => changeIsFormLoading(false, addCardForm),
-				2000
-			);
+			changeIsFormLoading(false, addCardForm);
 		});
 }
 
@@ -171,10 +164,7 @@ function editProfileFormSubmitHandler(event) {
 		})
 		.catch((e) => apiErrorFormHandler(e, editProfileForm))
 		.finally(() => {
-			editProfileButtonTimer = setTimeout(
-				() => changeIsFormLoading(false, editProfileForm),
-				2000
-			);
+			changeIsFormLoading(false, editProfileForm);
 		});
 }
 
@@ -190,10 +180,7 @@ function editAvatarFormSubmitHandler(event) {
 		})
 		.catch((e) => apiErrorFormHandler(e, editAvatarForm))
 		.finally(() => {
-			editAvatarButtonTimer = setTimeout(
-				() => changeIsFormLoading(false, editAvatarForm),
-				2000
-			);
+			changeIsFormLoading(false, editAvatarForm);
 		});
 }
 
@@ -218,36 +205,28 @@ function renderUserImage({ avatar }) {
 
 // Функция-обработчик кнопки редактирования профиля
 function editProfileHandler() {
+	validation.clearValidation(editProfileForm);
 	const { profileName, profileDesc } = getProfileInfo(profileInfo);
 	const { name, description } = editProfileForm.elements;
-	clearTimeout(editProfileButtonTimer);
-	changeIsFormLoading(false, editProfileForm);
 
-	[name.value, description.value] = [
-		profileName.textContent,
-		profileDesc.textContent,
-	];
-	validation.clearValidation(editProfileForm);
+	name.value = profileName.textContent;
+	description.value = profileDesc.textContent;
+
 	openModal(editProfilePopup);
 }
 
 // Функция-обработчик кнопки редактирования аватара
 function editAvatarHandler() {
+	validation.clearValidation(editAvatarForm);
 	const { link } = editAvatarForm.elements;
-	clearTimeout(editAvatarButtonTimer);
-	changeIsFormLoading(false, editAvatarForm);
 
 	link.value = profileImage.src;
-	validation.clearValidation(editAvatarForm);
+
 	openModal(editAvatarPopup);
 }
 
 // Функция-обработчик кнопки добавления карточки
 function addCardHandler() {
-	clearTimeout(addCardButtonTimer);
-	changeIsFormLoading(false, addCardForm);
-
-	addCardForm.reset();
 	validation.clearValidation(addCardForm);
 	openModal(addCardPopup);
 }
@@ -268,12 +247,7 @@ function openCard({ name, link }) {
 function changeIsFormLoading(isLoading, form) {
 	const btn = form.querySelector(".form__button");
 	btn.classList.remove("form__button_failed");
-
-	if (isLoading) {
-		btn.textContent = "Сохранение...";
-	} else {
-		btn.textContent = "Сохранить";
-	}
+	btn.textContent = isLoading ? "Сохранение..." : "Сохранить";
 }
 
 // Функция установки сообщения об ошибке в форме
