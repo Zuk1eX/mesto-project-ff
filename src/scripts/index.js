@@ -1,8 +1,6 @@
 // Импорты
-import { initialCards } from "./cards.js";
 import { createCard, removeCard, likeCard } from "./card.js";
 import { openModal, closeModal, closeModalHandler } from "./modal.js";
-// import { enableValidation, clearValidation } from "./validation.js";
 import { Validation } from "./validation.js";
 import {
 	APIError,
@@ -13,12 +11,12 @@ import {
 	updateUserAvatar,
 	updateUserInfo,
 } from "./api.js";
-import { checkImageUrl } from "./utils.js";
+import { reloadPage } from "./utils.js";
 
 // DOM узлы
 const profileImage = document.querySelector(".profile__image");
 const profileInfo = document.querySelector(".profile__info");
-const placesSection = document.querySelector(".places");
+const placesLoader = document.querySelector(".places__loader");
 const cardsList = document.querySelector(".places__list");
 
 const editProfileButton = document.querySelector(".profile__edit-button");
@@ -64,23 +62,55 @@ addCardPopup.addEventListener("click", closeModalHandler);
 openCardPopup.addEventListener("click", closeModalHandler);
 
 // Запрос и рендеринг информации о пользователе и карточек на страницу
-Promise.all([getUserInfo(), getInitialCards()])
-	.then(([user, cards]) => {
-		renderUserInfo(user);
-		renderUserImage(user);
+function renderPage() {
+	changeLoaderStatus(placesLoader, "loading");
 
-		editProfileButton.disabled = false;
-		editAvatarButton.disabled = false;
-		addCardButton.disabled = false;
+	Promise.all([getUserInfo(), getInitialCards()])
+		.then(([user, cards]) => {
+			renderUserInfo(user);
+			renderUserImage(user);
 
-		placesSection.classList.remove("places_loading");
+			editProfileButton.disabled = false;
+			editAvatarButton.disabled = false;
+			addCardButton.disabled = false;
 
-		const sortedCards = sortCards(cards);
-		renderCards(user._id, sortedCards, cardsList);
-	})
-	.catch((error) => {
-		console.log(error);
-	});
+			const sortedCards = sortCards(cards);
+			renderCards(user._id, sortedCards, cardsList);
+		})
+		.catch((error) => {
+			changeLoaderStatus(placesLoader, "error", error);
+			console.log(error);
+		})
+		.finally(() => {
+			changeLoaderStatus(placesLoader);
+		});
+}
+
+renderPage();
+
+function changeLoaderStatus(loader, status, error) {
+	switch (status) {
+		case "loading": {
+			loader.classList.add("loader_is-loading");
+			break;
+		}
+		case "error": {
+			loader.classList.add("loader_is-error");
+			loader
+				.querySelector(".loader__button")
+				.addEventListener("click", reloadPage);
+
+			if (error instanceof APIError) {
+				const errorText = loader.querySelector(".loader__error-code");
+				errorText.textContent = `Код ошибки: ${error.status}`;
+			}
+			break;
+		}
+		default: {
+			loader.classList.remove("loader_is-loading");
+		}
+	}
+}
 
 // Функция сортировки карточек по дате
 function sortCards(cards) {
@@ -119,7 +149,7 @@ function addCardFormSubmitHandler(event) {
 			renderCard(card.owner._id, card, cardsList, "prepend");
 			closeModal(addCardPopup);
 		})
-		.catch((e) => apiErrorHandler(e, addCardForm))
+		.catch((e) => apiErrorFormHandler(e, addCardForm))
 		.finally(() => {
 			addCardButtonTimer = setTimeout(
 				() => changeIsFormLoading(false, addCardForm),
@@ -139,7 +169,7 @@ function editProfileFormSubmitHandler(event) {
 			closeModal(editProfilePopup);
 			renderUserInfo(user);
 		})
-		.catch((e) => apiErrorHandler(e, editProfileForm))
+		.catch((e) => apiErrorFormHandler(e, editProfileForm))
 		.finally(() => {
 			editProfileButtonTimer = setTimeout(
 				() => changeIsFormLoading(false, editProfileForm),
@@ -158,7 +188,7 @@ function editAvatarFormSubmitHandler(event) {
 			closeModal(editAvatarPopup);
 			renderUserImage(user);
 		})
-		.catch((e) => apiErrorHandler(e, editAvatarForm))
+		.catch((e) => apiErrorFormHandler(e, editAvatarForm))
 		.finally(() => {
 			editAvatarButtonTimer = setTimeout(
 				() => changeIsFormLoading(false, editAvatarForm),
@@ -253,8 +283,8 @@ function setFormLoadingError(form, errorMessage) {
 	btn.classList.add("form__button_failed");
 }
 
-// Функция обработки ошибок обращения к API
-function apiErrorHandler(error, form) {
+// Функция обработки ошибок обращения к API в форме
+function apiErrorFormHandler(error, form) {
 	if (error instanceof APIError) {
 		setFormLoadingError(form, `Не удалось сохранить (${error.status})`);
 		console.log(`[${error.status}] ${error}`);

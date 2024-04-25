@@ -12,4 +12,8 @@ function checkImageUrl(url) {
 		});
 }
 
-export { checkImageUrl };
+function reloadPage() {
+	location.reload();
+}
+
+export { checkImageUrl, reloadPage };

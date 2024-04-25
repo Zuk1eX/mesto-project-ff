@@ -1,0 +1,11 @@
+.loader.loader_is-error {
+	display: flex;
+}
+
+.loader.loader_is-error .loader__error {
+	display: flex;
+}
+
+.loader.loader_is-error .loader__element {
+	display: none;
+}
