@@ -15,7 +15,7 @@
 
 ## Установка и запуск проекта в локальном репозитории
 
-1. `git clone` https://elrouss.github.io/mesto.git - клонировать репозиторий (с использованием HTTPS) на свое устройство
+1. `git clone` https://github.com/Zuk1eX/mesto-project-ff.git - клонировать репозиторий
 2. `npm i` - установить зависимости
 3. `npm run dev` - запустить приложение в режиме разработки (http://localhost:8080)
 
@@ -23,6 +23,5 @@
 
 1. Готовая версия проекта (gh-pages):
    [https://zuk1ex.github.io/mesto-project-ff]
-
 2. Исходники:
    [https://github.com/Zuk1eX/mesto-project-ff.git]
