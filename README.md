@@ -15,7 +15,7 @@
 
 ## Установка и запуск проекта в локальном репозитории
 
-1. `git clone` https://github.com/Zuk1eX/mesto-project-ff.git - клонировать репозиторий
+1. `git clone https://github.com/Zuk1eX/mesto-project-ff.git` - клонировать репозиторий
 2. `npm i` - установить зависимости
 3. `npm run dev` - запустить приложение в режиме разработки (http://localhost:8080)
 
